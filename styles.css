@@ -1409,6 +1409,55 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--primary-dark);
 }
 
+/* Mode Toggle (Pill Switch) */
+.calc-mode-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+}
+
+.calc-mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.calc-mode-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.calc-mode-btn:hover:not(.active) {
+  color: var(--primary-dark);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.calc-mode-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(10, 77, 162, 0.25);
+}
+
+.calc-mode-btn.active svg {
+  transform: scale(1.1);
+  color: #ffffff;
+}
+
 .calc-form-group {
   margin-bottom: 14px;
 }
@@ -1493,6 +1542,52 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+/* Dynamic Roof & Generation Auto-Summary */
+.calc-auto-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(10, 77, 162, 0.04) 100%);
+  border: 1.5px dashed rgba(14, 165, 233, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-top: 14px;
+}
+
+.auto-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.auto-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.auto-summary-label svg {
+  color: var(--accent);
+}
+
+.auto-summary-value {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.auto-summary-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(14, 165, 233, 0.25);
+}
+
 .calc-footnote {
   font-size: 0.74rem;
   color: var(--text-muted);
@@ -1561,6 +1656,72 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: #38bdf8;
   margin-left: 4px;
+}
+
+/* Required Roof Highlight Banner in Result Card */
+.result-roof-highlight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(4px);
+}
+
+.roof-highlight-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roof-highlight-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.roof-highlight-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.roof-highlight-val {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.roof-highlight-val strong {
+  color: #38bdf8;
+}
+
+.roof-unit {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.roof-note {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
 .result-metrics-grid {

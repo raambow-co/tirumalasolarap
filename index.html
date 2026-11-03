@@ -629,37 +629,68 @@
             </select>
           </div>
 
-          <!-- Monthly Bill Slider -->
-          <div class="calc-form-group">
+          <!-- Two-in-one Mode Toggle -->
+          <div class="calc-mode-nav" role="tablist">
+            <button type="button" class="calc-mode-btn active" id="calcTabBill" data-mode="bill" role="tab" aria-selected="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              By Monthly Bill (₹)
+            </button>
+            <button type="button" class="calc-mode-btn" id="calcTabCapacity" data-mode="capacity" role="tab" aria-selected="false">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              By Solar Capacity (kW)
+            </button>
+          </div>
+
+          <!-- Mode 1: Monthly Bill Slider -->
+          <div class="calc-form-group" id="groupCalcBill">
             <div class="calc-label-row">
               <label for="calcBill" class="calc-label">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
                 Current Monthly Electric Bill
               </label>
-              <span class="calc-live-value" id="calcBillVal">₹2,500</span>
+              <span class="calc-live-value" id="calcBillVal">₹3,500</span>
             </div>
-            <input type="range" id="calcBill" class="calc-range-slider" min="500" max="25000" step="500" value="2500">
+            <input type="range" id="calcBill" class="calc-range-slider" min="1000" max="30000" step="500" value="3500">
             <div class="slider-limits">
-              <span>₹500</span>
+              <span>₹1,000</span>
               <span>₹10,000</span>
-              <span>₹25,000+</span>
+              <span>₹30,000+</span>
             </div>
           </div>
 
-          <!-- Roof Area Slider -->
-          <div class="calc-form-group">
+          <!-- Mode 2: System Capacity Slider -->
+          <div class="calc-form-group" id="groupCalcCapacity" style="display: none;">
             <div class="calc-label-row">
-              <label for="calcRoof" class="calc-label">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                Usable Shadow-Free Roof Space
+              <label for="calcCapacity" class="calc-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Desired Solar Plant Capacity
               </label>
-              <span class="calc-live-value" id="calcRoofVal">300 Sq. Ft.</span>
+              <span class="calc-live-value" id="calcCapacityVal">3.5 kW</span>
             </div>
-            <input type="range" id="calcRoof" class="calc-range-slider" min="50" max="2000" step="25" value="300">
+            <input type="range" id="calcCapacity" class="calc-range-slider" min="1" max="15" step="0.5" value="3.5">
             <div class="slider-limits">
-              <span>50 Sq. Ft.</span>
-              <span>1,000 Sq. Ft.</span>
-              <span>2,000 Sq. Ft.</span>
+              <span>1 kW</span>
+              <span>5 kW</span>
+              <span>15 kW</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Space & Generation Auto-Calculated Badge -->
+          <div class="calc-auto-summary">
+            <div class="auto-summary-item">
+              <span class="auto-summary-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                Required Roof Space
+              </span>
+              <span class="auto-summary-value" id="autoRoofVal">~280 Sq. Ft.</span>
+            </div>
+            <div class="auto-summary-divider"></div>
+            <div class="auto-summary-item">
+              <span class="auto-summary-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+                Est. Monthly Generation
+              </span>
+              <span class="auto-summary-value" id="autoUnitsVal">~420 Units</span>
             </div>
           </div>
 
@@ -675,27 +706,38 @@
 
             <div class="result-system-size-block">
               <div class="size-label">RECOMMENDED SYSTEM SIZE</div>
-              <div class="size-val" id="resSystemSize">2.5 <span>kW</span></div>
+              <div class="size-val" id="resSystemSize">3.5 <span>kW</span></div>
+            </div>
+
+            <!-- Required Roof Highlight Banner -->
+            <div class="result-roof-highlight">
+              <div class="roof-highlight-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <div class="roof-highlight-content">
+                <div class="roof-highlight-label">REQUIRED SHADOW-FREE ROOF AREA</div>
+                <div class="roof-highlight-val"><strong id="resRequiredRoof">280</strong> <span class="roof-unit">Sq. Ft.</span> <span class="roof-note">(~80 sq.ft/kW)</span></div>
+              </div>
             </div>
 
             <div class="result-metrics-grid">
               <!-- Metric 1: Annual Savings -->
               <div class="metric-item">
                 <span class="metric-label">ANNUAL SAVINGS</span>
-                <span class="metric-value metric-savings" id="resAnnualSavings">₹29,200</span>
+                <span class="metric-value metric-savings" id="resAnnualSavings">₹40,950</span>
               </div>
 
               <!-- Metric 2: Govt Subsidy -->
               <div class="metric-item">
                 <span class="metric-label">GOVT. SUBSIDY</span>
-                <span class="metric-value metric-subsidy" id="resGovtSubsidy">₹60,000</span>
+                <span class="metric-value metric-subsidy" id="resGovtSubsidy">₹78,000</span>
               </div>
 
               <!-- Metric 3: Net Setup Cost -->
               <div class="metric-item">
                 <span class="metric-label">NET SETUP COST</span>
-                <span class="metric-value metric-cost" id="resNetCost">₹1,02,500</span>
-                <span class="cost-original" id="resOrigCost">₹1,62,500</span>
+                <span class="metric-value metric-cost" id="resNetCost">₹1,44,500</span>
+                <span class="cost-original" id="resOrigCost">₹2,22,500</span>
               </div>
 
               <!-- Metric 4: Payback Period -->

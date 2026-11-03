@@ -95,13 +95,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // 2. INTERACTIVE SOLAR SAVINGS CALCULATOR (Andhra Pradesh Tariffs)
   // =========================================================================
+  const tabModeBill = document.getElementById('calcTabBill');
+  const tabModeCapacity = document.getElementById('calcTabCapacity');
+  const groupCalcBill = document.getElementById('groupCalcBill');
+  const groupCalcCapacity = document.getElementById('groupCalcCapacity');
+
   const billSlider = document.getElementById('calcBill');
-  const roofSlider = document.getElementById('calcRoof');
+  const capacitySlider = document.getElementById('calcCapacity');
   const locationSelect = document.getElementById('calcLocation');
 
   const billValDisplay = document.getElementById('calcBillVal');
-  const roofValDisplay = document.getElementById('calcRoofVal');
+  const capacityValDisplay = document.getElementById('calcCapacityVal');
+  const autoRoofVal = document.getElementById('autoRoofVal');
+  const autoUnitsVal = document.getElementById('autoUnitsVal');
 
+  const resRequiredRoof = document.getElementById('resRequiredRoof');
   const resSystemSize = document.getElementById('resSystemSize');
   const resAnnualSavings = document.getElementById('resAnnualSavings');
   const resGovtSubsidy = document.getElementById('resGovtSubsidy');
@@ -110,64 +118,122 @@ document.addEventListener('DOMContentLoaded', () => {
   const resPayback = document.getElementById('resPayback');
   const applySubsidyBtn = document.getElementById('btnApplySubsidy');
 
+  let activeCalcMode = 'bill'; // 'bill' | 'capacity'
+
   function calculateSolarSavings() {
-    if (!billSlider || !roofSlider) return;
+    if (!billSlider || !capacitySlider) return;
 
-    const monthlyBill = parseInt(billSlider.value, 10);
-    const roofArea = parseInt(roofSlider.value, 10);
+    let finalKW = 3.5;
+    let monthlyBill = 3500;
 
-    billValDisplay.textContent = `₹${monthlyBill.toLocaleString('en-IN')}`;
-    roofValDisplay.textContent = `${roofArea.toLocaleString('en-IN')} Sq. Ft.`;
+    if (activeCalcMode === 'bill') {
+      monthlyBill = parseInt(billSlider.value, 10);
+      if (billValDisplay) billValDisplay.textContent = `₹${monthlyBill.toLocaleString('en-IN')}`;
 
-    let requiredKW = (monthlyBill / 1000);
-    requiredKW = Math.round(requiredKW * 2) / 2;
-    if (requiredKW < 1) requiredKW = 1;
+      // AP domestic tariff: ~₹7.8/unit. 1 kW generates ~125 units/month (~₹975-₹1000 bill offset)
+      let calcKW = (monthlyBill / 1000);
+      calcKW = Math.round(calcKW * 2) / 2;
+      finalKW = Math.max(1, Math.min(15, calcKW));
 
-    const maxKWByRoof = Math.floor((roofArea / 80) * 2) / 2;
-    const finalKW = Math.max(1, Math.min(requiredKW, maxKWByRoof > 0 ? maxKWByRoof : 1));
+      // Keep capacity slider in sync
+      capacitySlider.value = finalKW;
+      if (capacityValDisplay) capacityValDisplay.textContent = `${finalKW.toFixed(1)} kW`;
+    } else {
+      finalKW = parseFloat(capacitySlider.value);
+      if (capacityValDisplay) capacityValDisplay.textContent = `${finalKW.toFixed(1)} kW`;
 
+      // Approximate bill offset for this capacity
+      monthlyBill = Math.round(finalKW * 1000);
+      billSlider.value = Math.min(30000, Math.max(1000, monthlyBill));
+      if (billValDisplay) billValDisplay.textContent = `₹${monthlyBill.toLocaleString('en-IN')}`;
+    }
+
+    // Required Shadow-free Roof Space: ~80 sq.ft per kW in India (panels + clearance)
+    const reqRoofArea = Math.round(finalKW * 80);
+    const monthlyUnits = Math.round(finalKW * 125);
+
+    // Update dynamic auto-summary badges
+    if (autoRoofVal) autoRoofVal.textContent = `~${reqRoofArea.toLocaleString('en-IN')} Sq. Ft.`;
+    if (autoUnitsVal) autoUnitsVal.textContent = `~${monthlyUnits.toLocaleString('en-IN')} Units`;
+
+    // PM Surya Ghar Yojana Subsidy:
+    // 1 kW: ₹30,000 | 2 kW: ₹60,000 | 3 kW+: ₹78,000 (residential cap)
     let subsidy = 0;
     if (finalKW >= 3) {
       subsidy = 78000;
     } else if (finalKW >= 2) {
       subsidy = 60000;
-    } else {
+    } else if (finalKW >= 1) {
       subsidy = 30000;
+    } else {
+      subsidy = Math.round(finalKW * 30000);
     }
 
-    const grossCost = Math.round(finalKW * 65000);
+    // Benchmark turnkey AP pricing:
+    const grossCost = finalKW <= 3 
+      ? Math.round(finalKW * 65000) 
+      : Math.round(3 * 65000 + (finalKW - 3) * 55000);
+
     const netCost = Math.max(0, grossCost - subsidy);
     const annualUnits = finalKW * 125 * 12;
     const annualSavings = Math.round(annualUnits * 7.8);
     const paybackYears = (netCost / annualSavings).toFixed(1);
 
-    resSystemSize.innerHTML = `${finalKW.toFixed(1)} <span>kW</span>`;
-    resAnnualSavings.textContent = `₹${annualSavings.toLocaleString('en-IN')}`;
-    resGovtSubsidy.textContent = `₹${subsidy.toLocaleString('en-IN')}`;
-    resNetCost.textContent = `₹${netCost.toLocaleString('en-IN')}`;
-    resOrigCost.textContent = `₹${grossCost.toLocaleString('en-IN')}`;
-    resPayback.textContent = `${paybackYears} Years`;
+    // Update Results Card
+    if (resSystemSize) resSystemSize.innerHTML = `${finalKW.toFixed(1)} <span>kW</span>`;
+    if (resRequiredRoof) resRequiredRoof.textContent = reqRoofArea.toLocaleString('en-IN');
+    if (resAnnualSavings) resAnnualSavings.textContent = `₹${annualSavings.toLocaleString('en-IN')}`;
+    if (resGovtSubsidy) resGovtSubsidy.textContent = `₹${subsidy.toLocaleString('en-IN')}`;
+    if (resNetCost) resNetCost.textContent = `₹${netCost.toLocaleString('en-IN')}`;
+    if (resOrigCost) resOrigCost.textContent = `₹${grossCost.toLocaleString('en-IN')}`;
+    if (resPayback) resPayback.textContent = `${paybackYears} Years`;
   }
 
+  // Mode Toggle Handlers
+  tabModeBill?.addEventListener('click', () => {
+    activeCalcMode = 'bill';
+    tabModeBill.classList.add('active');
+    tabModeBill.setAttribute('aria-selected', 'true');
+    tabModeCapacity?.classList.remove('active');
+    tabModeCapacity?.setAttribute('aria-selected', 'false');
+
+    if (groupCalcBill) groupCalcBill.style.display = 'block';
+    if (groupCalcCapacity) groupCalcCapacity.style.display = 'none';
+    calculateSolarSavings();
+  });
+
+  tabModeCapacity?.addEventListener('click', () => {
+    activeCalcMode = 'capacity';
+    tabModeCapacity.classList.add('active');
+    tabModeCapacity.setAttribute('aria-selected', 'true');
+    tabModeBill?.classList.remove('active');
+    tabModeBill?.setAttribute('aria-selected', 'false');
+
+    if (groupCalcCapacity) groupCalcCapacity.style.display = 'block';
+    if (groupCalcBill) groupCalcBill.style.display = 'none';
+    calculateSolarSavings();
+  });
+
   billSlider?.addEventListener('input', calculateSolarSavings);
-  roofSlider?.addEventListener('input', calculateSolarSavings);
+  capacitySlider?.addEventListener('input', calculateSolarSavings);
   locationSelect?.addEventListener('change', calculateSolarSavings);
 
   calculateSolarSavings();
 
   applySubsidyBtn?.addEventListener('click', (e) => {
     e.preventDefault();
-    const systemSize = resSystemSize.textContent.replace('kW', '').trim();
-    const billVal = billSlider.value;
-    const selectedLoc = locationSelect.value;
+    const systemSize = resSystemSize?.textContent.replace('kW', '').trim() || '3.5';
+    const reqRoof = resRequiredRoof?.textContent || '280';
+    const billVal = billSlider ? billSlider.value : '3500';
+    const selectedLoc = locationSelect ? locationSelect.value : 'Vijayawada';
 
     const enquiryLocation = document.getElementById('enquiryCity');
     const enquiryBill = document.getElementById('enquiryBill');
     const enquiryCapacity = document.getElementById('enquiryCapacity');
 
     if (enquiryLocation) enquiryLocation.value = selectedLoc;
-    if (enquiryBill) enquiryBill.value = `₹${parseInt(billVal).toLocaleString('en-IN')}`;
-    if (enquiryCapacity) enquiryCapacity.value = `${systemSize} kW`;
+    if (enquiryBill) enquiryBill.value = `₹${parseInt(billVal, 10).toLocaleString('en-IN')} / month`;
+    if (enquiryCapacity) enquiryCapacity.value = `${systemSize} kW On-Grid (Req. ~${reqRoof} Sq. Ft.)`;
 
     const enquirySection = document.getElementById('enquiry');
     if (enquirySection) {
