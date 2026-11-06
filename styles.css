@@ -1259,6 +1259,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
+  color: #ffffff;
 }
 
 .subsidy-desc {
@@ -2410,6 +2411,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.15rem;
   font-weight: 700;
   margin-bottom: 8px;
+  color: #ffffff;
 }
 
 .enquiry-info-p {
